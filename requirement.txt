@@ -1,5 +1,6 @@
 streamlit>=1.30.0
-transformers==4.17.0  
-torch==1.9.0
+transformers==4.26.1
+torch==1.13.1
+
 
 
