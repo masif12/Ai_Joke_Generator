@@ -1,4 +1,5 @@
 import streamlit as st
+import torch
 from transformers import pipeline, set_seed
 from streamlit_lottie import st_lottie
 import requests
