@@ -1,46 +1,76 @@
 import streamlit as st
-from transformers import pipeline,set_seed
+from transformers import pipeline, set_seed
+from streamlit_lottie import st_lottie
+import requests
 
-# Load Hugging Face text generation pipeline
+# Function to load Lottie animation
+def load_lottieurl(url):
+    r = requests.get(url)
+    if r.status_code != 200:
+        return None
+    return r.json()
+
+# Load the animation (optional)
+lottie_json = load_lottieurl("https://assets1.lottiefiles.com/packages/lf20_jzqndnfe.json")
+
+# Initialize model
 joke_generator = pipeline("text-generation", model="gpt2", framework="pt")
 set_seed(42)
 
-# Streamlit app setup
-st.set_page_config(page_title="Joke Generator", page_icon="😂")
-st.title("😂 AI Joke Generator (Hugging Face)")
+# Set Streamlit config
+st.set_page_config(page_title="AI Joke Generator", page_icon="😂", layout="centered")
 
-# Predefined categories (optional — for user inspiration)
+# Show header and animation
+st.title("😂 AI Joke Generator")
+st.markdown("Make your day better with a little AI-powered humor!")
+
+if lottie_json:
+    st_lottie(lottie_json, height=200)
+
+# Joke categories
 categories = [
     "Marriage", "Programming", "Animals", "Doctors", "Work",
     "School", "Relationship", "Technology", "Food", "Politics"
 ]
 
-category = st.selectbox("Choose a joke topic:", categories)
+category = st.selectbox("🎯 Choose a joke topic:", categories)
 
-if st.button("Generate Joke"):
-    if not category:
-        st.warning("Please select a joke category.")
-    else:
-        # Create prompt for the HF model
-        prompt = f"tell me a joke about {category}"
+# Session state to store jokes
+if "joke_history" not in st.session_state:
+    st.session_state.joke_history = []
 
-        with st.spinner("Generating joke..."):
-            output = joke_generator(prompt, max_length=64, do_sample=True, top_k=50)[0]['generated_text']
-            
+# Generate joke
+if st.button("😂 Generate Joke"):
+    prompt = f"tell me a joke about {category}"
+    with st.spinner("Generating joke..."):
+        output = joke_generator(prompt, max_length=64, do_sample=True, top_k=50)[0]['generated_text']
+        joke = output.replace(prompt, "").strip()
 
-        st.success("Here’s your joke!")
-        st.write(output)
+    # Store joke in session
+    st.session_state.joke_history.append(joke)
 
-        # Display joke as code block
-        st.code(output, language='markdown')
+    # Display the joke
+    st.success("Here’s your joke!")
+    st.write(joke)
+    st.code(joke, language='markdown')
 
-        # Download option
-        st.download_button(
-            label="📥 Download Joke as .txt",
-            data=output,
-            file_name="joke.txt",
-            mime="text/plain"
-        )
+    # Download option
+    st.download_button(
+        label="📥 Download Joke as .txt",
+        data=joke,
+        file_name="joke.txt",
+        mime="text/plain"
+    )
 
+# Show history of generated jokes
+if st.session_state.joke_history:
+    with st.expander("📜 Joke History"):
+        for idx, past_joke in enumerate(reversed(st.session_state.joke_history), 1):
+            st.markdown(f"**{idx}.** {past_joke}")
+
+# Footer
 st.markdown("---")
-st.markdown("<p style='text-align:center;'>Made with ❤️ by Muhammad Asif | Powered by 🤗 Transformers & Streamlit</p>", unsafe_allow_html=True)
+st.markdown(
+    "<p style='text-align:center; color:gray;'>Made with ❤️ by Muhammad Asif | Powered by 🤗 Transformers & Streamlit</p>",
+    unsafe_allow_html=True
+)
