@@ -45,9 +45,8 @@ if st.button("😂 Generate Joke"):
     prompt = f"tell me a joke about {category}"
     with st.spinner("Generating joke..."):
         # Wrap the generation in a torch.no_grad() context to prevent unnecessary computation
-        with torch.no_grad():
-            output = joke_generator(prompt, max_length=100, do_sample=True, top_k=50)
-            generated_text = output[0]['generated_text'].replace(prompt, "").strip()
+        output = joke_generator(prompt, max_length=100, do_sample=True, top_k=50)
+        generated_text = output[0]['generated_text'].replace(prompt, "").strip()
 
     # Store joke in session
     st.session_state.joke_history.append(generated_text)
