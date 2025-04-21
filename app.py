@@ -14,7 +14,7 @@ def load_lottieurl(url):
 lottie_json = load_lottieurl("https://assets1.lottiefiles.com/packages/lf20_jzqndnfe.json")
 
 # Initialize model
-joke_generator = pipeline("text-generation", model="gpt2", framework="pt")
+joke_generator = pipeline("text-generation", model="gpt2", device=-1)
 set_seed(42)
 
 # Set Streamlit config
