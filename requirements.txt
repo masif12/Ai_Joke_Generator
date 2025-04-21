@@ -2,7 +2,7 @@ streamlit>=1.30.0
 transformers==4.21.2
 torch==1.13.1
 streamlit-lottie
-
+numpy
 
 
 
