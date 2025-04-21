@@ -43,21 +43,23 @@ if "joke_history" not in st.session_state:
 if st.button("😂 Generate Joke"):
     prompt = f"tell me a joke about {category}"
     with st.spinner("Generating joke..."):
-        output = joke_generator(prompt, max_length=64, do_sample=True, top_k=50)[0]['generated_text']
-        joke = output.replace(prompt, "").strip()
+        # Wrap the generation in a torch.no_grad() context to prevent unnecessary computation
+        with torch.no_grad():
+            output = joke_generator(prompt, max_length=100, do_sample=True, top_k=50)
+            generated_text = output[0]['generated_text'].replace(prompt, "").strip()
 
     # Store joke in session
-    st.session_state.joke_history.append(joke)
+    st.session_state.joke_history.append(generated_text)
 
     # Display the joke
     st.success("Here’s your joke!")
-    st.write(joke)
-    st.code(joke, language='markdown')
+    st.write(generated_text)
+    st.code(generated_text, language='markdown')
 
     # Download option
     st.download_button(
         label="📥 Download Joke as .txt",
-        data=joke,
+        data=generated_text,
         file_name="joke.txt",
         mime="text/plain"
     )
