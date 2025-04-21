@@ -4,9 +4,6 @@ from transformers import pipeline, set_seed
 from streamlit_lottie import st_lottie
 import requests
 
-import numpy as np
-st.write("✅ NumPy version:", np.__version__)
-
 
 # Function to load Lottie animation
 def load_lottieurl(url):
